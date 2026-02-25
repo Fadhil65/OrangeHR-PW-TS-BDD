@@ -1,0 +1,23 @@
+@regression @usulankerjasama
+Feature: Usulan Kerja Sama
+
+  As a user
+  I want to create usulan kerja sama
+
+
+  Background:
+    Given I am on the login page
+
+@negative @negativeusulankerjasama @usulankerjasama
+   Scenario: User
+    When User login with valid email "fadhilahalwi09@gmail.com" and valid password "Pass1234!"
+    Then User click button login
+    Then User should see name and dashboard title
+    Then User click Usulan Kerja Sama Menu
+    Then User click tambah usulan button
+    Then User click button selanjutnya
+    Then User should see validation message for nama institusi
+    Then User input "test" on field Nama institusi
+    Then User input "alasan banget" on field alasan kerja sama
+    Then User click button selanjutnya
+    Then User should see an error message mandatory
