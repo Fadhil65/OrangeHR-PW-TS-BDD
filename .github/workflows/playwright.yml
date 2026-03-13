@@ -1,11 +1,14 @@
 name: Playwright OrangeHr
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
   schedule:
-    - cron: '0 13 * * *' # Running otomatis jam 20:00 WIB
+  - cron: '0 13 * * *' # Running otomatis jam 20:00 WIB
+  workflow_dispatch:
+    # Trigger manual dari GitHub Actions
 
 permissions:
   contents: write
@@ -16,21 +19,21 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-
-    - uses: actions/setup-node@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: 20 
+        node-version: 20
         cache: 'npm'
 
     - name: Install dependencies
       run: npm ci
 
-    
     - name: Get Playwright version
-      id: playwright-version
       run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")" >> $GITHUB_ENV
 
     - name: Cache Playwright Browsers
@@ -44,12 +47,10 @@ jobs:
       if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps
 
-
     - name: Run Playwright tests
       run: npx bddgen && npx playwright test
       continue-on-error: true
 
-   
     - name: Upload Allure Results as Artifact
       if: always()
       uses: actions/upload-artifact@v4
@@ -58,27 +59,24 @@ jobs:
         path: allure-results/
         retention-days: 7
 
-    
     - name: Get Allure history
-      uses: actions/checkout@v4
       if: always()
       continue-on-error: true
+      uses: actions/checkout@v4
       with:
         ref: gh-pages
         path: allure-history
 
-    - name: Allure Report action
-      uses: simple-elf/allure-report-action@v1.9
+    - name: Generate Allure Report
       if: always()
-      with:
-        allure_results: allure-results
-        allure_history: allure-history
-        keep_reports: 20
+      run: |
+        npm install -g allure-commandline
+        allure generate allure-results --clean -o allure-history/${{ github.run_number }}
+        cp -r allure-history/${{ github.run_number }}/* allure-history/
 
     - name: Notify if tests failed
       if: failure()
-      run: echo "::error title=Test Failed::Ada test yang gagal, check Allure Report!"
-
+      run: echo "::error title=Test Failed::Ada test yang gagal, cek Allure Report!"
 
     - name: Deploy report to Github Pages
       if: always()
@@ -87,3 +85,11 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
         publish_dir: allure-history
+
+    - name: Warm up GitHub Pages
+      if: always()
+      run: |
+        echo "Waiting for pages to deploy..."
+        sleep 30
+        curl -s https://fadhil65.github.io/OrangeHR-PW-TS/ > /dev/null
+        echo "Pages warmed up! ✅"
