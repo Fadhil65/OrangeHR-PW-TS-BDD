@@ -1,1 +1,1 @@
-{"name":"Allure Report","stats":{"failed":0,"broken":0,"skipped":0,"passed":10,"unknown":0,"total":10},"status":"passed","duration":15595,"createdAt":1795644303995,"plugin":"Allure2","meta":{"reportId":"f42c1441-1e7c-44ce-b24f-a58181090ea9","singleFile":false}}
+{"name":"Allure Report","stats":{"failed":0,"broken":0,"skipped":0,"passed":10,"unknown":0,"total":10},"status":"passed","duration":18354,"createdAt":1795730583556,"plugin":"Allure2","meta":{"reportId":"d88c1510-8b2d-4a54-990a-aacde55e5243","singleFile":false}}
